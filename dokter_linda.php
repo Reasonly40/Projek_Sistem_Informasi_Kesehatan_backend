@@ -45,7 +45,7 @@ $result = $conn->query($sql);
     <!-- Section: Dokter Detail -->
     <section id="DokterDetail">
       <div class="dokter-heading">
-        <h1>Dr. Jasmine Cooper</h1>
+        <h1>Dr. Linda Davis</h1>
         <p>Spesialis Dermatologi</p>
       </div>
       <div class="dokter-detail-container">

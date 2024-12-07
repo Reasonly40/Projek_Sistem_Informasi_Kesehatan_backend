@@ -71,10 +71,37 @@ include('dbconn.php');
             Poli Gigi dan Mulut menyediakan layanan pemeriksaan, perawatan, dan tindakan gigi, termasuk pencabutan gigi dan perawatan gigi berlubang
           </p>
           <h3>Jadwal Layanan</h3>
-          <ul>
-            <li><i class="fa fa-calendar"></i> Senin - Kamis: 08.00 - 17.00</li>
-            <li><i class="fa fa-calendar"></i> Jumat: 08.00 - 12.00</li>
-          </ul>
+           <!-- Jadwal Dokter -->
+           <table>
+            <thead>
+              <tr>
+                <th>Nama Dokter</th>
+                <th>Hari</th>
+                <th>Jam</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              // Query untuk mendapatkan jadwal dokter yang melayani Poli Anak
+              $query = "SELECT name, hari, jam FROM dokter WHERE Lokasi LIKE '%Poli Gigi%'";
+              $result = mysqli_query($conn, $query);
+
+              // Periksa apakah data ada
+              if (mysqli_num_rows($result) > 0) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                  echo "<tr>";
+                  echo "<td>" . htmlspecialchars($row['name']) . "</td>";
+                  echo "<td>" . htmlspecialchars($row['hari']) . "</td>";
+                  echo "<td>" . htmlspecialchars($row['jam']) . "</td>";
+                  echo "</tr>";
+                }
+              } else {
+                echo "<tr><td colspan='3'>Tidak ada jadwal dokter untuk Poli .</td></tr>";
+              }
+              ?>
+            </tbody>
+          </table>
+
           <div class="Home-btn">
             <a href="appointment.php">
               <i class="fa-regular fa-calendar-days"></i>
