@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Dec 08, 2024 at 02:42 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: 127.0.0.1
+-- Generation Time: Dec 08, 2024 at 06:37 PM
+-- Server version: 11.1.0-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -31,15 +31,18 @@ CREATE TABLE `berita` (
   `id` int(11) NOT NULL,
   `judul` varchar(255) NOT NULL,
   `konten` text NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `gambar` varchar(255) NOT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `tanggal` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `berita`
 --
 
-INSERT INTO `berita` (`id`, `judul`, `konten`, `created_at`) VALUES
-(1, '10 Perkembangan Teknologi Kesehatan', 'Pada tahun 2024, terobosan teknologi di bidang kesehatan telah membuka pintu menuju masa depan', '2024-12-07 23:43:06');
+INSERT INTO `berita` (`id`, `judul`, `konten`, `gambar`, `link`, `tanggal`) VALUES
+(3, 'gfhfgh', 'qqqqq', 'berita22.jpg', 'https://github.com/Reasonly40/Projek-Biomedis-Sistem-Informasi-Kesehatan/deployments', '2024-12-09 00:39:48'),
+(4, 'gfhfghdddddddddd', 'dfsfsdfs', 'berita2.jpg', 'https://github.com/Reasonly40/Projek-Biomedis-Sistem-Informasi-Kesehatan/deployments', '2024-12-09 00:48:55');
 
 --
 -- Indexes for dumped tables
@@ -59,7 +62,7 @@ ALTER TABLE `berita`
 -- AUTO_INCREMENT for table `berita`
 --
 ALTER TABLE `berita`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
