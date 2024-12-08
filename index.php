@@ -4,7 +4,6 @@ session_start();
 
 // Include the database connection
 include('dbconn.php');
-
 ?>
 
 <!DOCTYPE html>

@@ -12,9 +12,17 @@ try {
 
     // Cek apakah form dikirimkan dengan metode POST
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Ambil data dari session (data user yang login)
+        if (isset($_SESSION['id'], $_SESSION['email'], $_SESSION['role'])) {
+            $user_id = $_SESSION['id'];
+            $patient_name = $_SESSION['name']; // Pastikan nama tersimpan di session
+            $email = $_SESSION['email'];
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Silakan login untuk membuat janji temu.']);
+            exit();
+        }
+
         // Ambil data dari form
-        $name = $_POST['name'];
-        $email = $_POST['email'];
         $phone = $_POST['phone'];
         $service = $_POST['service'];
         $doctor = $_POST['doctor'];
@@ -23,12 +31,13 @@ try {
         $notes = isset($_POST['notes']) ? $_POST['notes'] : '';
 
         // Persiapkan query SQL untuk memasukkan data ke dalam database
-        $sql = "INSERT INTO appointments (name, email, phone, service, doctor, date, time, notes) 
-                VALUES (:name, :email, :phone, :service, :doctor, :date, :time, :notes)";
+        $sql = "INSERT INTO appointments (user_id, patient_name, email, phone, service, doctor, date, time, notes) 
+                VALUES (:user_id, :patient_name, :email, :phone, :service, :doctor, :date, :time, :notes)";
 
         // Persiapkan statement dan bind parameter
         $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':patient_name', $patient_name);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':phone', $phone);
         $stmt->bindParam(':service', $service);
@@ -39,14 +48,12 @@ try {
 
         // Eksekusi query
         if ($stmt->execute()) {
-            // Kirim respon sukses ke front-end
             echo json_encode(['status' => 'success', 'message' => 'Janji temu berhasil dibuat!']);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Gagal membuat janji temu. Silakan coba lagi.']);
         }
     }
 } catch (PDOException $e) {
-    // Tangani kesalahan koneksi database
     echo json_encode(['status' => 'error', 'message' => 'Koneksi database gagal: ' . $e->getMessage()]);
 }
 ?>

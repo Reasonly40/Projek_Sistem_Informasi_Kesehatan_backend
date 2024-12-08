@@ -21,14 +21,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['email'] = $user['email'];
         $_SESSION['role'] = $user['role'];  // Assuming 'role' column exists (admin or user)
         
-        // Redirect user to homepage or another page after login
-        header("Location: index.php"); // Change this to wherever you want the user to go
+        // Redirect based on role
+        if ($user['role'] === 'admin') {
+            header("Location: admin.php");
+        } elseif ($user['role'] === 'user') {
+            header("Location: index.php");
+        } else {
+            $error_message = "Invalid role assigned to user!";
+        }
         exit();
     } else {
         $error_message = "Invalid email or password!";
     }
 }
-
 $conn->close();
 ?>
 
