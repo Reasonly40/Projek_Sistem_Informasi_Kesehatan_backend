@@ -1,28 +1,39 @@
 <?php
-include('dbconn.php');
+include('dbconn.php'); // Koneksi database
 
-$id = $_GET['id'];
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $pasien = $_POST['pasien'];
-    $diagnosis = $_POST['diagnosis'];
-    $dokter = $_POST['dokter'];
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $query = "SELECT * FROM rekam_medis WHERE id = ?";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, 'i', $id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $rekam_medis = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+}
 
-    $sql = "UPDATE rekam_medis SET pasien='$pasien', diagnosis='$diagnosis', dokter='$dokter' WHERE id='$id'";
-    if ($conn->query($sql)) {
-        header("Location: rekam_medis.php");
-        exit();
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $nama_pasien = htmlspecialchars(trim($_POST['nama_pasien']));
+    $poli = htmlspecialchars(trim($_POST['poli']));
+    $dokter = htmlspecialchars(trim($_POST['dokter']));
+    $diagnosis = htmlspecialchars(trim($_POST['diagnosis']));
+    $tanggal = $_POST['tanggal'];
+    $catatan = htmlspecialchars(trim($_POST['catatan']));
+
+    if ($nama_pasien && $poli && $dokter && $diagnosis && $tanggal) {
+        $query = "UPDATE rekam_medis SET nama_pasien = ?, poli = ?, dokter = ?, 
+                  diagnosis = ?, tanggal = ?, catatan = ? WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, 'ssssssi', $nama_pasien, $poli, $dokter, $diagnosis, $tanggal, $catatan, $id);
+
+        if (mysqli_stmt_execute($stmt)) {
+            echo "<script>alert('Rekam medis berhasil diperbarui!'); window.location.href='rekam_medis.php';</script>";
+        } else {
+            echo "Terjadi kesalahan: " . mysqli_error($conn);
+        }
+        mysqli_stmt_close($stmt);
     } else {
-        echo "Error: " . $conn->error;
+        echo "<script>alert('Harap isi semua data dengan benar.');</script>";
     }
-} else {
-    $result = $conn->query("SELECT * FROM rekam_medis WHERE id='$id'");
-    $data = $result->fetch_assoc();
 }
 ?>
-
-<form method="POST">
-    <input type="text" name="pasien" value="<?= $data['pasien'] ?>" required>
-    <input type="text" name="diagnosis" value="<?= $data['diagnosis'] ?>" required>
-    <input type="text" name="dokter" value="<?= $data['dokter'] ?>" required>
-    <button type="submit">Update</button>
-</form>

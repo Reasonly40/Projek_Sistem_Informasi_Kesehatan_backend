@@ -96,7 +96,7 @@ mysqli_close($conn); // Pastikan koneksi database ditutup setelah selesai
     <div class="container">
         <h1>Hapus Antrian</h1>
         <p>Apakah Anda yakin ingin menghapus antrian ini?</p>
-        <a href="index.php" class="btn-back">Kembali ke Beranda</a>
+        <a href="admin.php" class="btn-back">Kembali ke Beranda</a>
     </div>
 </body>
 </html>

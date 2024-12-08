@@ -1,54 +1,28 @@
 <?php
-// Mulai sesi
-session_start();
+include('dbconn.php'); // Pastikan koneksi database sudah benar
 
-// Masukkan koneksi ke database
-include('dbconn.php');
-
-// Pesan untuk menampilkan hasil aksi (berhasil atau gagal)
-$message = "";
-
-// Ambil data dokter berdasarkan ID jika disediakan
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-
-    // Query untuk mengambil data dokter
-    $sql = "SELECT * FROM dokter WHERE id = '$id'";
-    $result = $conn->query($sql);
-
-    // Jika data ditemukan
-    if ($result->num_rows > 0) {
-        $doctor = $result->fetch_assoc();
-    } else {
-        $message = "Dokter tidak ditemukan!";
-    }
+    $query = "SELECT * FROM data_dokter WHERE id = $id";
+    $result = mysqli_query($conn, $query);
+    $dokter = mysqli_fetch_assoc($result);
 }
 
-// Proses jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Ambil data dari form
-    $id = $_POST['id'];
-    $name = $_POST['name'];
-    $hari = $_POST['hari'];
-    $jam = $_POST['jam'];
-    $lokasi = $_POST['lokasi'];
+    $nama_dokter = $_POST['nama_dokter'];
+    $spesialis = $_POST['spesialis'];
 
-    // Query untuk mengupdate data dokter
-    $sql = "UPDATE dokter 
-            SET name = '$name', hari = '$hari', jam = '$jam', Lokasi = '$lokasi' 
-            WHERE id = '$id'";
-
-    // Mengeksekusi query dan mengecek apakah berhasil
-    if ($conn->query($sql) === TRUE) {
-        $message = "Data dokter berhasil diperbarui!";
+    $query = "UPDATE data_dokter SET nama_dokter = '$nama_dokter', spesialis = '$spesialis' WHERE id = $id";
+    if (mysqli_query($conn, $query)) {
+        echo "Data dokter berhasil diperbarui!";
     } else {
-        $message = "Terjadi kesalahan: " . $conn->error;
+        echo "Terjadi kesalahan: " . mysqli_error($conn);
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -74,11 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             text-align: center;
             color: #333;
             margin-bottom: 20px;
-        }
-
-        p {
-            text-align: center;
-            font-size: 16px;
         }
 
         form {
@@ -146,40 +115,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Edit Data Dokter</h1>
-    <?php if (isset($message)) echo "<p style='color: green;'>$message</p>"; ?>
+    <div class="container">
+        <h1>Edit Dokter</h1>
+        <form method="POST" action="">
+            <label for="nama_dokter">Nama Dokter</label>
+            <input type="text" id="nama_dokter" name="nama_dokter" value="<?php echo $dokter['nama']; ?>" required>
 
-    <!-- Form Edit Dokter -->
-    <?php if (isset($doctor)): ?>
-        <form action="edit_dokter.php" method="POST">
-            <input type="hidden" name="id" value="<?php echo $doctor['id']; ?>">
-            
-            <label for="name">Nama:</label>
-            <input type="text" id="name" name="name" value="<?php echo $doctor['name']; ?>" required>
+            <label for="spesialis">Spesialis</label>
+            <input type="text" id="spesialis" name="spesialis" value="<?php echo $dokter['spesialis']; ?>" required>
 
-            <label for="hari">Hari:</label>
-            <input type="text" id="hari" name="hari" value="<?php echo $doctor['hari']; ?>" required>
-
-            <label for="jam">Jam:</label>
-            <input type="text" id="jam" name="jam" value="<?php echo $doctor['jam']; ?>" required>
-
-            <label for="lokasi">Lokasi:</label>
-            <input type="text" id="lokasi" name="lokasi" value="<?php echo $doctor['Lokasi']; ?>" required>
-
-            <button type="submit">Simpan Perubahan</button>
+            <button type="submit">Perbarui Dokter</button>
         </form>
-    <?php else: ?>
-        <p>Data dokter tidak tersedia untuk diedit.</p>
-    <?php endif; ?>
-
-    <!-- Tombol Kembali ke Beranda -->
-    <a href="admin.php"><button class="btn-back">Kembali ke Beranda</button></a>
-</div>
+        <a href="admin.php" class="btn-back">Kembali ke Beranda</a>
+    </div>
 </body>
 </html>
-
-<?php
-// Tutup koneksi
-$conn->close();
-?>

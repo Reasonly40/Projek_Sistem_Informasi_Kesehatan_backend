@@ -1,32 +1,29 @@
 <?php
-// Menghubungkan ke database
 include 'dbconn.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
-    if (isset($_GET['id'])) {
-        $id = intval($_GET['id']); // Ambil ID poli dari parameter GET
-        $query = "DELETE FROM poli WHERE id = ?"; // Ganti 'poli' dengan nama tabel jika berbeda
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, "i", $id);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nama_poli = $_POST['nama_poli'];
+    $description = $_POST['description'];
 
-        if (mysqli_stmt_execute($stmt)) {
-            // Redirect ke halaman daftar poli setelah berhasil menghapus
-            header("Location: data_poli.php?message=deleted");
-            exit;
-        } else {
-            echo "Terjadi kesalahan: " . mysqli_error($conn);
-        }
+    $query = "INSERT INTO poli (nama_poli, description) VALUES (?, ?)";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "ss", $nama_poli, $description);
+
+    if (mysqli_stmt_execute($stmt)) {
+        header("Location: admin.php");
+        exit;
     } else {
-        echo "ID tidak valid.";
+        echo "Error: " . mysqli_error($conn);
     }
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konfirmasi Hapus Poli</title>
+    <title>Tambah Poli</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -113,22 +110,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
             text-decoration: underline;
         }
     </style>
-    <script>
-        function confirmDeletion(event) {
-            event.preventDefault();
-            if (confirm("Apakah Anda yakin ingin menghapus poli ini?")) {
-                document.getElementById('delete-form').submit();
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Konfirmasi Hapus Poli</h1>
-        <form id="delete-form" method="POST" action="delete_poli.php?id=<?= htmlspecialchars($_GET['id']) ?>">
-            <button type="submit" name="confirm_delete" onclick="confirmDeletion(event)">Hapus</button>
+        <h1>Tambah Poli</h1>
+        <form method="POST">
+            <label for="nama_poli">Nama Poli</label>
+            <input type="text" id="nama_poli" name="nama_poli" required>
+
+            <label for="description">Deskripsi</label>
+            <textarea id="description" name="description" rows="5"></textarea>
+
+            <button type="submit">Simpan</button>
         </form>
-        <a href="admin.php" class="btn-back">Kembali ke Beranda</a>
+        <a href="admin.php" class="btn-back">Kembali</a>
     </div>
 </body>
 </html>

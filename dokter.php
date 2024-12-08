@@ -1,35 +1,21 @@
 <?php
-// Mulai sesi
-session_start();
-
-// Masukkan koneksi ke database
 include('dbconn.php');
 
-// Pesan untuk menampilkan hasil aksi (berhasil atau gagal)
-$message = "";
-
-// Proses jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Ambil data dari form
-    $name = $_POST['name'];
-    $hari = $_POST['hari'];
-    $jam = $_POST['jam'];
-    $lokasi = $_POST['lokasi'];
+    $nama_dokter = $_POST['nama_dokter'];
+    $spesialis = $_POST['spesialis'];
 
-    // Query untuk menambahkan data dokter
-    $sql = "INSERT INTO dokter (name, hari, jam, Lokasi) VALUES ('$name', '$hari', '$jam', '$lokasi')";
-
-    // Mengeksekusi query dan mengecek apakah berhasil
-    if ($conn->query($sql) === TRUE) {
-        $message = "Data dokter berhasil ditambahkan!";
+    $query = "INSERT INTO data_dokter (nama_dokter, spesialis) VALUES ('$nama_dokter', '$spesialis')";
+    if (mysqli_query($conn, $query)) {
+        echo "Dokter berhasil ditambahkan!";
     } else {
-        $message = "Terjadi kesalahan: " . $conn->error;
+        echo "Terjadi kesalahan: " . mysqli_error($conn);
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -127,34 +113,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Tambah Data Dokter</h1>
-    <?php if (isset($message)) echo "<p style='color: green;'>$message</p>"; ?>
+    <div class="container">
+        <h1>Tambah Dokter</h1>
+        <form method="POST" action="">
+            <label for="nama_dokter">Nama Dokter</label>
+            <input type="text" id="nama_dokter" name="nama_dokter" required>
 
-    <!-- Form Tambah Dokter -->
-    <form action="dokter.php" method="POST">
-        <label for="name">Nama:</label>
-        <input type="text" id="name" name="name" required>
+            <label for="spesialis">Spesialis</label>
+            <input type="text" id="spesialis" name="spesialis" required>
 
-        <label for="hari">Hari:</label>
-        <input type="text" id="hari" name="hari" required>
-
-        <label for="jam">Jam:</label>
-        <input type="text" id="jam" name="jam" required>
-
-        <label for="lokasi">Lokasi:</label>
-        <input type="text" id="lokasi" name="lokasi" required>
-
-        <button type="submit">Tambah Dokter</button>
-    </form>
-
-    <!-- Tombol Kembali ke Beranda -->
-    <a href="admin.php"><button class="btn-back">Kembali ke Beranda</button></a>
-</div>
+            <button type="submit">Tambah Dokter</button>
+        </form>
+        <a href="admin.php" class="btn-back">Kembali ke Beranda</a>
+    </div>
 </body>
 </html>
-
-<?php
-// Tutup koneksi
-$conn->close();
-?>

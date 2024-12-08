@@ -1,32 +1,39 @@
 <?php
-// Menghubungkan ke database
-include 'dbconn.php';
+// Mulai sesi
+session_start();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
-    if (isset($_GET['id'])) {
-        $id = intval($_GET['id']); // Ambil ID poli dari parameter GET
-        $query = "DELETE FROM poli WHERE id = ?"; // Ganti 'poli' dengan nama tabel jika berbeda
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, "i", $id);
+// Masukkan koneksi ke database
+include('dbconn.php');
 
-        if (mysqli_stmt_execute($stmt)) {
-            // Redirect ke halaman daftar poli setelah berhasil menghapus
-            header("Location: data_poli.php?message=deleted");
-            exit;
-        } else {
-            echo "Terjadi kesalahan: " . mysqli_error($conn);
-        }
+// Pesan untuk menampilkan hasil aksi (berhasil atau gagal)
+$message = "";
+
+// Proses jika form disubmit
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Ambil data dari form
+    $name = $_POST['name'];
+    $hari = $_POST['hari'];
+    $jam = $_POST['jam'];
+    $lokasi = $_POST['lokasi'];
+
+    // Query untuk menambahkan data dokter
+    $sql = "INSERT INTO dokter (name, hari, jam, Lokasi) VALUES ('$name', '$hari', '$jam', '$lokasi')";
+
+    // Mengeksekusi query dan mengecek apakah berhasil
+    if ($conn->query($sql) === TRUE) {
+        $message = "Data dokter berhasil ditambahkan!";
     } else {
-        echo "ID tidak valid.";
+        $message = "Terjadi kesalahan: " . $conn->error;
     }
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konfirmasi Hapus Poli</title>
+    <title>Tambah Dokter</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,6 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
             margin-bottom: 20px;
         }
 
+        p {
+            text-align: center;
+            font-size: 16px;
+        }
+
         form {
             display: flex;
             flex-direction: column;
@@ -61,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
             color: #333;
         }
 
-        input[type="text"], input[type="email"], input[type="phone"], input[type="date"], input[type="time"], textarea {
+        input[type="text"] {
             padding: 8px;
             font-size: 14px;
             border: 1px solid #ddd;
@@ -113,22 +125,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
             text-decoration: underline;
         }
     </style>
-    <script>
-        function confirmDeletion(event) {
-            event.preventDefault();
-            if (confirm("Apakah Anda yakin ingin menghapus poli ini?")) {
-                document.getElementById('delete-form').submit();
-            }
-        }
-    </script>
 </head>
 <body>
-    <div class="container">
-        <h1>Konfirmasi Hapus Poli</h1>
-        <form id="delete-form" method="POST" action="delete_poli.php?id=<?= htmlspecialchars($_GET['id']) ?>">
-            <button type="submit" name="confirm_delete" onclick="confirmDeletion(event)">Hapus</button>
-        </form>
-        <a href="admin.php" class="btn-back">Kembali ke Beranda</a>
-    </div>
+<div class="container">
+    <h1>Tambah Data Dokter</h1>
+    <?php if (isset($message)) echo "<p style='color: green;'>$message</p>"; ?>
+
+    <!-- Form Tambah Dokter -->
+    <form action="dokter.php" method="POST">
+        <label for="name">Nama:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="hari">Hari:</label>
+        <input type="text" id="hari" name="hari" required>
+
+        <label for="jam">Jam:</label>
+        <input type="text" id="jam" name="jam" required>
+
+        <label for="lokasi">Lokasi:</label>
+        <input type="text" id="lokasi" name="lokasi" required>
+
+        <button type="submit">Tambah Dokter</button>
+    </form>
+
+    <!-- Tombol Kembali ke Beranda -->
+    <a href="admin.php"><button class="btn-back">Kembali ke Beranda</button></a>
+</div>
 </body>
 </html>
+
+<?php
+// Tutup koneksi
+$conn->close();
+?>

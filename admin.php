@@ -62,7 +62,7 @@ include('dbconn.php');
         <!-- Section: Data Jadwal Dokter -->
         <section id="jadwal">
             <h2>Data Jadwal Dokter</h2>
-            <button onclick="window.location.href='dokter.php'">Tambah Jadwal</button>
+            <button onclick="window.location.href='jadwal_dokter.php'">Tambah Jadwal</button>
             <div class="table-container">
                 <table>
                     <thead>
@@ -77,7 +77,7 @@ include('dbconn.php');
                     </thead>
                     <tbody>
                         <?php
-                        $query = "SELECT * FROM dokter";
+                        $query = "SELECT * FROM jadwal_dokter";
                         $result = mysqli_query($conn, $query);
                         while ($row = mysqli_fetch_assoc($result)) {
                             echo "<tr>
@@ -87,8 +87,8 @@ include('dbconn.php');
                                     <td>{$row['jam']}</td>
                                     <td>{$row['Lokasi']}</td>
                                     <td>
-                                        <a href='edit_dokter.php?id={$row['id']}'><button>Edit</button></a>
-                                        <a href='hapus_dokter.php?id={$row['id']}'><button>Hapus</button></a>
+                                        <a href='edit_jadwal_dokter.php?id={$row['id']}'><button>Edit</button></a>
+                                        <a href='hapus_jadwal_dokter.php?id={$row['id']}'><button>Hapus</button></a>
                                     </td>
                                   </tr>";
                         }
@@ -101,7 +101,7 @@ include('dbconn.php');
         <!-- Section: Dokter -->
         <section id="dokter">
             <h2>Dokter</h2>
-            <button onclick="window.location.href='data_dokter.php'">Tambah Dokter</button>
+            <button onclick="window.location.href='dokter.php'">Tambah Dokter</button>
             <div class="table-container">
                 <table>
                     <thead>
@@ -115,7 +115,7 @@ include('dbconn.php');
                     <tbody>
                         <?php
                         // Query untuk mengambil data dokter
-                        $query = "SELECT id, nama, spesialis FROM data_dokter";
+                        $query = "SELECT id, nama, spesialis FROM dokter";
                         $result = mysqli_query($conn, $query);
 
                         // Periksa apakah data ada
@@ -127,8 +127,8 @@ include('dbconn.php');
                                         <td>{$row['nama']}</td>
                                         <td>{$row['spesialis']}</td>
                                         <td>
-                                            <a href='edit_data_dokter.php?id={$row['id']}'><button>Edit</button></a>
-                                            <a href='hapus_data_dokter.php?id={$row['id']}'><button>Hapus</button></a>
+                                            <a href='edit_dokter.php?id={$row['id']}'><button>Edit</button></a>
+                                            <a href='hapus_dokter.php?id={$row['id']}'><button>Hapus</button></a>
                                         </td>
                                     </tr>";
                             }
@@ -163,7 +163,7 @@ include('dbconn.php');
                             echo "<tr>
                                     <td>{$row['id']}</td>
                                     <td>{$row['nama_poli']}</td>
-                                    <td>{$row['deskripsi']}</td>
+                                    <td>{$row['description']}</td>
                                     <td>
                                         <a href='edit_poli.php?id={$row['id']}'><button>Edit</button></a>
                                         <a href='hapus_poli.php?id={$row['id']}'><button>Hapus</button></a>
@@ -194,27 +194,28 @@ include('dbconn.php');
                     </thead>
                     <tbody>
                         <?php
-                        $query = "SELECT antrian.id, pasien.nama AS nama_pasien, antrian.no_antrian, 
-                            poli.nama_poli, dokter.nama AS nama_dokter, antrian.waktu
-                            FROM antrian 
-                            INNER JOIN pasien ON antrian.pasien_id = pasien.id
-                            INNER JOIN poli ON antrian.poli_id = poli.id
-                            INNER JOIN dokter ON antrian.dokter_id = dokter.id";
-                            $result = mysqli_query($conn, $query);
+                        $query = "SELECT appointments.id, users.name AS nama_pasien, appointments.no_antrian, 
+                        poli.nama_poli, dokter.nama AS nama_dokter, appointments.waktu
+                        FROM appointments 
+                        INNER JOIN users ON appointments.patient_id = users.id
+                        INNER JOIN poli ON appointments.poli_id = poli.id
+                        INNER JOIN dokter ON appointments.dokter_id = dokter.id";
+                        $result = mysqli_query($conn, $query);
+                        
                         while ($row = mysqli_fetch_assoc($result)) {
                             echo "<tr>
                                     <td>{$row['id']}</td>
                                     <td>{$row['nama_pasien']}</td>
                                     <td>{$row['no_antrian']}</td>
                                     <td>{$row['nama_poli']}</td>
-                                    <td>{$row['nama_dokter']}</td> <!-- Menampilkan nama dokter -->
+                                    <td>{$row['nama_dokter']}</td>
                                     <td>{$row['waktu']}</td>
                                     <td>
                                         <a href='edit_antrian.php?id={$row['id']}'><button>Edit</button></a>
                                         <a href='hapus_antrian.php?id={$row['id']}'><button>Hapus</button></a>
                                     </td>
-                                  </tr>";
-                        }                        
+                                    </tr>";
+                        }        
                         ?>
                     </tbody>
                 </table>
@@ -238,10 +239,10 @@ include('dbconn.php');
                     </thead>
                     <tbody>
                         <?php
-                        $query = "SELECT rekam_medis.id, pasien.nama AS pasien, rekam_medis.diagnosis, dokter.nama AS dokter
-                                  FROM rekam_medis 
-                                  INNER JOIN pasien ON rekam_medis.pasien_id = pasien.id
-                                  INNER JOIN dokter ON rekam_medis.dokter_id = dokter.id";
+                        $query = "SELECT rekam_medis.id, users.name AS pasien, rekam_medis.diagnosis, dokter.nama AS dokter
+                                FROM rekam_medis 
+                                INNER JOIN users ON rekam_medis.pasien_id = users.id
+                                INNER JOIN dokter ON rekam_medis.dokter_id = dokter.id";
                         $result = mysqli_query($conn, $query);
                         while ($row = mysqli_fetch_assoc($result)) {
                             echo "<tr>
@@ -253,7 +254,7 @@ include('dbconn.php');
                                         <a href='edit_rekam_medis.php?id={$row['id']}'><button>Edit</button></a>
                                         <a href='hapus_rekam_medis.php?id={$row['id']}'><button>Hapus</button></a>
                                     </td>
-                                  </tr>";
+                                </tr>";
                         }
                         ?>
                     </tbody>

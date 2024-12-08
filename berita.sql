@@ -24,35 +24,31 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `dokter`
+-- Table structure for table `berita`
 --
 
-CREATE TABLE `dokter` (
+CREATE TABLE `berita` (
   `id` int(11) NOT NULL,
-  `nama` varchar(255) NOT NULL,
-  `spesialis` varchar(255) NOT NULL
+  `judul` varchar(255) NOT NULL,
+  `konten` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `dokter`
+-- Dumping data for table `berita`
 --
 
-INSERT INTO `dokter` (`id`, `nama`, `spesialis`) VALUES
-(1, 'Dr. Jasmine Cooper', 'Spesialis Anak'),
-(2, 'Dr. David Brown', 'Spesialis Bedah Ortopedi'),
-(3, 'Dr. Linda Davis', 'Spesialis Dermatologi'),
-(4, 'Dr. Sarah Williams', 'Spesialis THT'),
-(5, 'Dr. Michael Lee', 'Spesialis Penyakit Dalam'),
-(6, 'Dr. Jennifer Clark', 'Spesialis Ginekologi');
+INSERT INTO `berita` (`id`, `judul`, `konten`, `created_at`) VALUES
+(1, '10 Perkembangan Teknologi Kesehatan', 'Pada tahun 2024, terobosan teknologi di bidang kesehatan telah membuka pintu menuju masa depan', '2024-12-07 23:43:06');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `dokter`
+-- Indexes for table `berita`
 --
-ALTER TABLE `dokter`
+ALTER TABLE `berita`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -60,10 +56,10 @@ ALTER TABLE `dokter`
 --
 
 --
--- AUTO_INCREMENT for table `dokter`
+-- AUTO_INCREMENT for table `berita`
 --
-ALTER TABLE `dokter`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+ALTER TABLE `berita`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
