@@ -1,78 +1,149 @@
 <?php
-session_start();
 include('dbconn.php');
 
-$message = "";
+$id = $_GET['id'];
+$query = "SELECT * FROM berita WHERE id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param('i', $id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
 
-// Ambil data berita berdasarkan ID
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $sql = "SELECT * FROM berita WHERE id = '$id'";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        $berita = $result->fetch_assoc();
-    } else {
-        $message = "Berita tidak ditemukan!";
-    }
-}
-
-// Proses jika form disubmit
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $judul = $_POST['judul'];
     $konten = $_POST['konten'];
+    $link = $_POST['link'];
 
-    $sql = "UPDATE berita SET judul = '$judul', konten = '$konten' WHERE id = '$id'";
+    // Cek apakah gambar diunggah
+    if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === UPLOAD_ERR_OK) {
+        $gambarName = $_FILES['gambar']['name'];
+        $gambarTmp = $_FILES['gambar']['tmp_name'];
+        $uploadDir = 'images/';
+        $gambarPath = $uploadDir . basename($gambarName);
 
-    if ($conn->query($sql) === TRUE) {
-        $message = "Berita berhasil diperbarui!";
+        if (move_uploaded_file($gambarTmp, $gambarPath)) {
+            // Hapus gambar lama
+            if (file_exists("images/" . $row['gambar'])) {
+                unlink("images/" . $row['gambar']);
+            }
+            $gambar = basename($gambarName);
+        }
     } else {
-        $message = "Terjadi kesalahan: " . $conn->error;
+        $gambar = $row['gambar'];
     }
+
+    $query = "UPDATE berita SET judul = ?, konten = ?, gambar = ?, link = ? WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('ssssi', $judul, $konten, $gambar, $link, $id);
+    $stmt->execute();
+
+    header('Location: admin.php');
 }
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Berita</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; }
-        .container { width: 50%; margin: 50px auto; background-color: #fff; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 8px; }
-        h1 { text-align: center; color: #333; margin-bottom: 20px; }
-        form { display: flex; flex-direction: column; }
-        label { margin: 10px 0 5px; font-size: 16px; color: #333; }
-        input[type="text"], textarea { padding: 8px; font-size: 14px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px; }
-        button { padding: 10px; background-color: #4CAF50; color: white; font-size: 16px; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; }
-        button:hover { background-color: #45a049; }
-        .btn-back { padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; text-align: center; margin-top: 20px; }
-        .btn-back:hover { background-color: #0056b3; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .form-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .form-container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        input[type="text"], textarea, input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+        }
+        textarea {
+            resize: vertical;
+            height: 150px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .back-btn {
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #218838;
+        }
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Edit Berita</h1>
-    <?php if (isset($message)) echo "<p style='color: green;'>$message</p>"; ?>
 
-    <?php if (isset($berita)): ?>
-        <form action="edit_berita.php?id=<?php echo $berita['id']; ?>" method="POST">
-            <label for="judul">Judul:</label>
-            <input type="text" id="judul" name="judul" value="<?php echo $berita['judul']; ?>" required>
-
-            <label for="konten">Konten:</label>
-            <textarea id="konten" name="konten" required><?php echo $berita['konten']; ?></textarea>
-
-            <button type="submit">Perbarui Berita</button>
+    <div class="form-container">
+        <h2>Edit Berita</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="text" name="judul" value="<?= htmlspecialchars($row['judul']) ?>" required>
+            <textarea name="konten" required><?= htmlspecialchars($row['konten']) ?></textarea>
+            <input type="text" name="link" value="<?= htmlspecialchars($row['link']) ?>" placeholder="Link Sumber">
+            <input type="file" name="gambar" accept="image/*">
+            <button type="submit">Simpan Perubahan</button>
         </form>
-    <?php else: ?>
-        <p>Berita tidak ditemukan untuk diedit.</p>
-    <?php endif; ?>
+        <!-- Tombol Kembali ke Admin -->
+        <a href="admin.php" class="back-btn">Kembali ke Halaman Admin</a>
+        <div class="form-footer">
+            <p>&copy; 2024 Biomedis</p>
+        </div>
+    </div>
 
-    <a href="admin.php"><button class="btn-back">Kembali ke Beranda</button></a>
-</div>
 </body>
 </html>
-
-<?php $conn->close(); ?>
