@@ -87,7 +87,7 @@ include('dbconn.php');
             <tbody>
               <?php
               // Query untuk mendapatkan jadwal dokter yang melayani Poli Anak
-              $query = "SELECT name, hari, jam FROM dokter WHERE Lokasi LIKE '%Poli THT%'";
+              $query = "SELECT name, hari, jam FROM jadwal_dokter WHERE Lokasi LIKE '%Poli THT%'";
               $result = mysqli_query($conn, $query);
 
               // Periksa apakah data ada
