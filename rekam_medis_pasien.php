@@ -1,6 +1,13 @@
 <?php
 // Mulai session di awal halaman
 session_start();
+var_dump($_SESSION);
+
+// Include koneksi ke database
+include('dbconn.php');
+
+// Ambil user_id dari session
+$user_id = $_SESSION['user_id'];
 
 // Cek apakah session user_id ada, jika tidak, alihkan ke halaman login
 if (!isset($_SESSION['user_id'])) {
@@ -14,12 +21,6 @@ if ($_SESSION['role'] != 'user') {
     exit;
 }
 
-// Ambil user_id dari session
-$user_id = $_SESSION['user_id'];
-
-// Include koneksi ke database
-include('dbconn.php');
-
 // Ambil data rekam medis pasien berdasarkan user_id
 $query = "SELECT * FROM rekam_medis WHERE user_id = '$user_id'";
 $result = mysqli_query($conn, $query);
@@ -30,7 +31,6 @@ if (mysqli_num_rows($result) == 0) {
 } else {
     $rekam_medis = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -46,7 +46,7 @@ if (mysqli_num_rows($result) == 0) {
 <header>
     <div class="logo">
         <img src="Images/LogoNumberOneHealth.png" alt="NumberOneHealth Logo" />
-        <a>Number<span>ONE</span>Health</a>
+        <a href="#">Number<span>ONE</span>Health</a>
     </div>
     <nav class="navbar">
         <a href="#Home">Beranda</a>
@@ -75,17 +75,17 @@ if (mysqli_num_rows($result) == 0) {
                 <tbody>
                     <?php foreach ($rekam_medis as $rekam): ?>
                         <tr>
-                            <td><?php echo $rekam['id']; ?></td>
-                            <td><?php echo $rekam['tanggal']; ?></td>
-                            <td><?php echo $rekam['diagnosa']; ?></td>
-                            <td><?php echo $rekam['perawatan']; ?></td>
-                            <td><?php echo $rekam['dokter']; ?></td>
+                            <td><?php echo htmlspecialchars($rekam['id']); ?></td>
+                            <td><?php echo htmlspecialchars($rekam['tanggal']); ?></td>
+                            <td><?php echo htmlspecialchars($rekam['diagnosa']); ?></td>
+                            <td><?php echo htmlspecialchars($rekam['perawatan']); ?></td>
+                            <td><?php echo htmlspecialchars($rekam['dokter']); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         <?php else: ?>
-            <p>Anda belum memiliki rekam medis.</p>
+            <p class="no-records">Anda belum memiliki rekam medis.</p>
         <?php endif; ?>
 
     </div>

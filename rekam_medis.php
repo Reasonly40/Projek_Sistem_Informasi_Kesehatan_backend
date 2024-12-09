@@ -4,23 +4,24 @@ include 'dbconn.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Ambil data dari form
-    $pasien_id = $_POST['pasien_id'];
+    $pasien_id = $_POST['user_id'];
     $poli_id = $_POST['poli_id'];
     $dokter_id = $_POST['dokter_id'];
     $diagnosis = $_POST['diagnosis'];
+    $created_at = $_POST['created_at']; // For Appointment Date
 
-    // Query untuk memasukkan data
-    $query = "INSERT INTO rekam_medis (pasien_id, poli_id, dokter_id, diagnosis) 
-              VALUES (?, ?, ?, ?)";
+    // Query untuk memasukkan data rekam medis
+    $query = "INSERT INTO rekam_medis (user_id, poli_id, dokter_id, diagnosis, created_at) 
+              VALUES (?, ?, ?, ?, ?)";
 
     // Gunakan prepared statement untuk keamanan
     if ($stmt = mysqli_prepare($conn, $query)) {
         // Bind parameter
-        mysqli_stmt_bind_param($stmt, "iiis", $pasien_id, $poli_id, $dokter_id, $diagnosis);
+        mysqli_stmt_bind_param($stmt, "iiiss", $pasien_id, $poli_id, $dokter_id, $diagnosis, $created_at);
 
         // Eksekusi statement
         if (mysqli_stmt_execute($stmt)) {
-            echo "<script>alert('Rekam Medis berhasil ditambahkan!'); window.location.href='data_rekam_medis.php';</script>";
+            echo "<script>alert('Rekam Medis berhasil ditambahkan!'); window.location.href='admin.php';</script>";
         } else {
             echo "<script>alert('Error: " . mysqli_stmt_error($stmt) . "');</script>";
         }
@@ -100,9 +101,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <div class="container">
         <h1>Tambah Rekam Medis</h1>
-        <form action="tambah_rekam_medis.php" method="POST">
-            <label for="pasien_id">Nama Pasien</label>
-            <select name="pasien_id" id="pasien_id" required>
+        <form action="rekam_medis.php" method="POST">
+            <label for="user_id">Nama Pasien</label>
+            <select name="user_id" id="user_id" required>
                 <?php
                 // Ambil data pasien dari tabel 'users'
                 $query = "SELECT id, name FROM users WHERE role = 'user'";
@@ -137,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <select name="dokter_id" id="dokter_id" required>
                 <?php
                 // Ambil data dokter dari tabel 'dokter'
-                $query = "SELECT id, name FROM dokter";
+                $query = "SELECT id, nama FROM dokter";
                 $result = mysqli_query($conn, $query);
                 if ($result) {
                     while ($row = mysqli_fetch_assoc($result)) {
@@ -148,6 +149,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 ?>
             </select>
+
+            <label for="created_at">Tanggal Janji Temu</label>
+            <input type="datetime-local" name="created_at" id="created_at" required />
 
             <label for="diagnosis">Diagnosis</label>
             <textarea name="diagnosis" id="diagnosis" rows="5" required></textarea>

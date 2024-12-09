@@ -4,7 +4,7 @@ include('dbconn.php');
 
 if (isset($_POST['submit'])) {
     // Ambil data dari form
-    $nama_poli = $_POST['nama_poli']; // Nama Poli dipilih dari dropdown
+    $nama_poli = $_POST['nama_poli']; // Nama Poli diketik
     $deskripsi = $_POST['deskripsi'];
     $icon = $_POST['icon'];
     $gambar = $_FILES['gambar']['name'];
@@ -117,19 +117,10 @@ if (isset($_POST['submit'])) {
     <div class="container">
         <h2>Tambah Poli Baru</h2>
         <form action="tambah_poli.php" method="POST" enctype="multipart/form-data">
-            <!-- Pilihan Poli -->
+            <!-- Input untuk Nama Poli -->
             <div class="form-group">
                 <label for="nama_poli">Nama Poli:</label>
-                <select name="nama_poli" class="form-control" required>
-                    <option value="Mata">Mata</option>
-                    <option value="Anak">Anak</option>
-                    <option value="Kandungan">Kandungan</option>
-                    <option value="Penyakit Dalam">Penyakit Dalam</option>
-                    <option value="Gigi">Gigi</option>
-                    <option value="Jantung">Jantung</option>
-                    <option value="Kulit">Kulit</option>
-                    <option value="THT">THT</option>
-                </select>
+                <input type="text" name="nama_poli" class="form-control" required placeholder="Masukkan Nama Poli">
             </div>
 
             <div class="form-group">
