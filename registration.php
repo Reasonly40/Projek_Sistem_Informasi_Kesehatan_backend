@@ -14,9 +14,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $password = $_POST['password'];
+    $address = $_POST['address']; // 'address'
+    $dob = $_POST['dob']; // 'dob'
+    $phone = $_POST['phone']; // Added phone number
 
     // Validate form inputs
-    if (empty($name) || empty($email) || empty($password)) {
+    if (empty($name) || empty($email) || empty($password) || empty($address) || empty($dob) || empty($phone)) {
         $error_message = "All fields are required!";
     } else {
         // Check if email already exists in the database
@@ -29,8 +32,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Hash the password using MD5
             $hashed_password = md5($password); // MD5 hash for password
 
-            // Insert new user into the database
-            $sql_insert = "INSERT INTO users (name, email, password, role) VALUES ('$name', '$email', '$hashed_password', 'user')";
+            // Insert new user into the database (including the phone number)
+            $sql_insert = "INSERT INTO users (name, email, password, alamat, tanggal_lahir, no_telepon, role) 
+                           VALUES ('$name', '$email', '$hashed_password', '$address', '$dob', '$phone', 'user')";
 
             if ($conn->query($sql_insert) === TRUE) {
                 // Redirect to login page after successful registration
@@ -46,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Close the database connection
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -83,6 +88,17 @@ $conn->close();
                     </div>
                     <div class="textbox">
                         <input type="password" placeholder="Password" name="password" required />
+                    </div>
+                    <!-- Tambahan kolom alamat -->
+                    <div class="textbox">
+                        <input type="text" placeholder="Address" name="address" required />
+                    </div>
+                    <!-- Tambahan kolom tanggal lahir -->
+                    <div class="textbox">
+                        <input type="date" placeholder="Date of Birth" name="dob" required />
+                    </div>
+                    <div class="textbox">
+                        <input type="text" placeholder="Phone Number" name="phone" required />
                     </div>
                     <button type="submit" class="btn">Register</button>
                     <div class="register">
