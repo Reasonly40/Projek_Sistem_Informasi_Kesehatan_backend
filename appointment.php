@@ -5,74 +5,57 @@ session_start();
 // Include the database connection
 include('dbconn.php');
 
+// Generate CSRF token if not set
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 try {
     // Koneksi ke database
     $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Jika request method adalah GET, fetch data layanan dan dokter
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if (isset($_GET['fetch']) && $_GET['fetch'] === 'services') {
-            // Fetch daftar layanan (poli)
-            $sql = "SELECT id, nama_poli FROM poli";
-            $stmt = $pdo->query($sql);
-            $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode($services);
-            exit();
-        }
-
-        if (isset($_GET['fetch']) && $_GET['fetch'] === 'doctors') {
-            // Fetch daftar dokter berdasarkan poli
-            if (!isset($_GET['poli_id'])) {
-                echo json_encode(['status' => 'error', 'message' => 'Poli ID tidak diberikan.']);
-                exit();
-            }
-
-            $poli_id = $_GET['poli_id'];
-            $sql = "SELECT id, nama_dokter, jadwal FROM dokter WHERE poli_id = :poli_id";
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':poli_id', $poli_id, PDO::PARAM_INT);
-            $stmt->execute();
-            $doctors = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode($doctors);
-            exit();
-        }
-    }
-
-    // Proses pengajuan janji temu
+    // Cek apakah form dikirimkan dengan metode POST
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Ambil data user dari session
-        if (isset($_SESSION['id'], $_SESSION['email'], $_SESSION['name'])) {
-            $user_id = $_SESSION['id'];
-            $patient_name = $_SESSION['name'];
-            $email = $_SESSION['email'];
-        } else {
+        // Validasi token CSRF
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            echo json_encode(['status' => 'error', 'message' => 'Token CSRF tidak valid.']);
+            exit();
+        }
+
+        // Validasi session user
+        if (!isset($_SESSION['id'], $_SESSION['name'], $_SESSION['email'], $_SESSION['role'])) {
             echo json_encode(['status' => 'error', 'message' => 'Silakan login untuk membuat janji temu.']);
             exit();
         }
 
+        $user_id = $_SESSION['id'];
+        $patient_name = $_SESSION['name'];
+        $email = $_SESSION['email'];
+
         // Ambil data dari form
         $phone = $_POST['phone'];
-        $service = $_POST['service'];
-        $doctor = $_POST['doctor'];
-        $date = $_POST['date'];
-        $time = $_POST['time'];
+        $poli = $_POST['poli'];
+        $doctor = $_POST['doctor_name'];
+        $date = $_POST['appointment_date'];
+        $time = $_POST['appointment_time'];
         $notes = isset($_POST['notes']) ? $_POST['notes'] : '';
 
-        // Simpan janji temu ke database
-        $sql = "INSERT INTO appointments (user_id, patient_name, email, phone, service, doctor, date, time, notes) 
-                VALUES (:user_id, :patient_name, :email, :phone, :service, :doctor, :date, :time, :notes)";
+        // Persiapkan query SQL untuk memasukkan data ke dalam database
+        $sql = "INSERT INTO appointments (user_id, patient_name. poli, doctor_name, appointment_date, appointment_time, notes) 
+                VALUES (:user_id, :patient_name, :poli, :doctor_name, :date, :time, :notes)";
         $stmt = $pdo->prepare($sql);
+
+        // Bind parameter
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':patient_name', $patient_name);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':phone', $phone);
-        $stmt->bindParam(':service', $service);
-        $stmt->bindParam(':doctor', $doctor);
-        $stmt->bindParam(':date', $date);
-        $stmt->bindParam(':time', $time);
+        $stmt->bindParam(':poli', $poli);
+        $stmt->bindParam(':doctor_name', $doctor);
+        $stmt->bindParam(':appointment_date', $date);
+        $stmt->bindParam(':appointment_time', $time);
         $stmt->bindParam(':notes', $notes);
 
+        // Eksekusi query
         if ($stmt->execute()) {
             echo json_encode(['status' => 'success', 'message' => 'Janji temu berhasil dibuat!']);
         } else {
@@ -80,7 +63,8 @@ try {
         }
     }
 } catch (PDOException $e) {
-    echo json_encode(['status' => 'error', 'message' => 'Koneksi database gagal: ' . $e->getMessage()]);
+    error_log("Database Error: " . $e->getMessage());
+    echo json_encode(['status' => 'error', 'message' => 'Terjadi kesalahan pada server.']);
 }
 ?>
 
@@ -119,10 +103,11 @@ try {
     </header>
 
   <main>
-    <section class="appointment-form">
-      <h2>Buat Janji Temu</h2>
-      <form id="appointmentForm">
-        <div class="form-group">
+      <section class="appointment-form">
+        <h2>Buat Janji Temu</h2>
+        <form id="appointmentForm" action="appointment.php" method="POST">
+      <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+      <div class="form-group">
           <label for="name">Nama Lengkap:</label>
           <input type="text" id="name" name="name" placeholder="Masukkan nama Anda" required />
         </div>
@@ -130,40 +115,40 @@ try {
           <label for="email">Email:</label>
           <input type="email" id="email" name="email" placeholder="Masukkan email Anda" required />
         </div>
-        <div class="form-group">
+      <div class="form-group">
           <label for="phone">Nomor Telepon:</label>
-          <input type="tel" id="phone" name="phone" placeholder="Masukkan nomor telepon Anda" required />
-        </div>
-        <div class="form-group">
-          <label for="service">Layanan yang Dipilih:</label>
-          <select id="service" name="service" required>
-            <option value="">Pilih layanan</option>
-            <option value="poli_anak">Poli Anak</option>
-            <option value="poli_bedah">Poli Bedah</option>
-            <option value="poli_kulit_dan_kelamin">Poli Kulit dan Kelamin</option>
-            <option value="poli_tht">Poli THT</option>
-            <option value="poli_penyakit_dalam">Poli Penyakit Dalam</option>
-            <option value="poli_ginekologi">Poli Kandungan</option>
+          <input type="tel" id="phone" name="phone" required>
+      </div>
+      <div class="form-group">
+          <label for="poli">Layanan yang Dipilih:</label>
+          <select id="poli" name="poli" required>
+              <option value="">Pilih layanan</option>
+              <option value="poli_anak">Poli Anak</option>
+              <option value="poli_bedah">Poli Bedah</option>
+              <option value="poli_kulit_dan_kelamin">Poli Kulit dan Kelamin</option>
+              <option value="poli_tht">Poli THT</option>
+              <option value="poli_penyakit_dalam">Poli Penyakit Dalam</option>
+              <option value="poli_ginekologi">Poli Kandungan</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label for="doctor">Dokter yang Tersedia:</label>
-          <select id="doctor" name="doctor" required>
-            <option value="">Pilih layanan terlebih dahulu</option>
+      </div>
+      <div class="form-group">
+          <label for="doctor_name">Dokter yang Tersedia:</label>
+          <select id="doctor_name" name="doctor_name" required>
+              <option value="">Pilih layanan terlebih dahulu</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label for="date">Tanggal:</label>
-          <input type="date" id="date" name="date" required />
-        </div>
-        <div class="form-group">
-          <label for="time">Waktu:</label>
-          <input type="time" id="time" name="time" required />
-        </div>
-        <div class="form-group">
+      </div>
+      <div class="form-group">
+          <label for="appointment_date">Tanggal:</label>
+          <input type="date" id="appointment_date" name="appointment_date" required>
+      </div>
+      <div class="form-group">
+          <label for="appointment_time">Waktu:</label>
+          <input type="time" id="appointment_time" name="appointment_time" required>
+      </div>
+      <div class="form-group">
           <label for="notes">Catatan Tambahan:</label>
-          <textarea id="notes" name="notes" placeholder="Tulis catatan Anda di sini (opsional)"></textarea>
-        </div>
+          <textarea id="notes" name="notes"></textarea>
+      </div>
         <button type="submit" class="btn">Ajukan Janji Temu</button>
       </form>
       <div class="success-message" id="successMessage">

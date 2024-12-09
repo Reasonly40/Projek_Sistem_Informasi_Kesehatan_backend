@@ -163,233 +163,122 @@ include('dbconn.php');
       </div>
     </section>
 
-    <section id="Poli">
-      <div class="poli-heading">
+<section id="Poli">
+    <div class="poli-heading">
         <div class="poli-heading-text">
-          <strong>Pelayanan Medis Unggulan</strong>
-          <h2>Poli Terbaik dengan Layanan Profesional untuk Kesehatan Anda</h2>
+            <strong>Pelayanan Medis Unggulan</strong>
+            <h2>Poli Terbaik dengan Layanan Profesional untuk Kesehatan Anda</h2>
         </div>
-      </div>
+    </div>
 
-      <div class="poli-container">
+    <div class="poli-container">
         <div class="swiper mySwiperpoli">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide">
-              <div class="poli-box box-no1">
-                <i class="fa-solid fa-tooth"></i>
-                <strong>Poli Gigi dan Mulut</strong>
-                <p>Menyediakan perawatan gigi, termasuk pembersihan, penambalan, pencabutan gigi, serta perawatan untuk masalah kesehatan mulut.</p>
-                <a href="poli_gigi.php">Selengkapnya</a>
-              </div>
-            </div>
+            <div class="swiper-wrapper">
+                <?php
+                // Ambil data poli dari database
+                $query = "SELECT * FROM poli";
+                $result = mysqli_query($conn, $query);
 
-            <div class="swiper-slide">
-              <div class="poli-box box-no2">
-                <i class="fa-solid fa-child"></i>
-                <strong>Poli Anak </strong>
-                <p>Memberikan layanan medis untuk anak-anak, mulai dari bayi hingga remaja, termasuk imunisasi, pemeriksaan tumbuh kembang, dan penanganan masalah kesehatan anak.</p>
-                <a href="poli_anak.php">Selengkapnya</a>
-              </div>
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $gambarPath = 'images/' . $row['gambar']; // Path gambar
+                    echo "
+                    <div class='swiper-slide'>
+                        <div class='poli-box'>
+                            <i class='fa-solid {$row['icon']}'></i>
+                            <strong>{$row['nama_poli']}</strong>
+                            <p>{$row['description']}</p>
+                            <a href='poli_detail.php?id={$row['id']}'>Selengkapnya</a>
+                        </div>
+                    </div>";
+                }
+                ?>
             </div>
-
-            <div class="swiper-slide">
-              <div class="poli-box box-no3">
-                <i class="fa-solid fa-person-pregnant"></i>
-                <strong>Poli Kandungan</strong>
-                <p>Fokus pada perawatan ibu hamil, persalinan, dan perawatan pasca melahirkan, serta layanan terkait kesehatan reproduksi wanita</p>
-                <a href="poli_kandungan.php">Selengkapnya</a>
-              </div>
-            </div>
-
-            <div class="swiper-slide">
-              <div class="poli-box box-no4">
-                <i class="fa-solid fa-syringe"></i>
-                <strong>Poli Bedah</strong>
-                <p>Menyediakan layanan untuk pasien yang membutuhkan tindakan bedah, baik bedah umum maupun spesialisasi seperti bedah ortopedi, bedah saraf, dan lainnya.</p>
-                <a href="poli_bedah.php">Selengkapnya</a>
-              </div>
-            </div>
-
-            <div class="swiper-slide">
-              <div class="poli-box box-no5">
-                <i class="fa-solid fa-heart-pulse"></i>
-                <strong>Poli Jantung</strong>
-                <p>Layanan untuk menangani gangguan jantung dan pembuluh darah, termasuk pemeriksaan seperti EKG, tes jantung, dan terapi untuk penyakit jantung.</p>
-                <a href="poli_jantung.php">Selengkapnya</a>
-              </div>
-            </div>
-
-            <div class="swiper-slide">
-              <div class="poli-box box-no6">
-                <i class="fa-solid fa-brain"></i>
-                <strong>Poli Saraf</strong>
-                <p>Memberikan perawatan untuk gangguan saraf, termasuk konsultasi dan terapi untuk masalah neurologis seperti stroke, epilepsi, dan gangguan saraf lainnya.</p>
-                <a href="poli_saraf.php">Selengkapnya</a>
-              </div>
-            </div>
-          </div>
-                    <div class="swiper-button-next"></div>
+            <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
-      </div>
-    </section>
+        </div>
+    </div>
+</section>
 
-    <section id="Dokter">
-      <div class="dokter-heading">
+
+<section id="Dokter">
+    <div class="dokter-heading">
         <h3>Temukan Dokter Terbaik untuk Kesehatan Anda</h3>
-        <p>Cari dan buat janji dengan dokter_yang paling sesuai dengan kebutuhan kesehatan Anda. Kesehatan Anda adalah prioritas kami.</p>
-      </div>
+        <p>Cari dan buat janji dengan dokter yang paling sesuai dengan kebutuhan kesehatan Anda. Kesehatan Anda adalah prioritas kami.</p>
+    </div>
 
-      <div class="dokter-container">
-
-        <div class="swiper mySwiperdokter">
+    <<div class="dokter-container">
+    <div class="swiper mySwiperdokter">
         <div class="swiper-wrapper">
+            <?php
+            // Query untuk mengambil data dokter dari database
+            $query = "SELECT id, nama, spesialis, gambar FROM dokterinfo";
+            $result = mysqli_query($conn, $query);
 
-          <div class="swiper-slide">
-            <a href="dokter_jasmine.php">
-            <div class="dokter-box">
-              <div class="dokter-img">
-               <img src="Images/team1.jpg" alt="">
-             </div>
-            <div class="dokter-text">
-              <strong>Dr. Jasmine Cooper</strong>
-              <span>Spesialis Anak</span>
-            </div>
-          </div>
-          </a>
+            // Periksa apakah ada data dokter
+            if (mysqli_num_rows($result) > 0) {
+                // Loop untuk menampilkan data dokter
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $gambarPath = 'images/' . $row['gambar']; // Path gambar dokter
+                    echo "
+                    <div class='swiper-slide'>
+                        <a href='dokter_detail.php?id={$row['id']}'>
+                            <div class='dokter-box'>
+                                <div class='dokter-img'>
+                                    <img src='$gambarPath' alt='{$row['nama']}'>
+                                </div>
+                                <div class='dokter-text'>
+                                    <strong>{$row['nama']}</strong>
+                                    <span>{$row['spesialis']}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>";
+                }
+            } else {
+                echo "<div class='swiper-slide'>Tidak ada dokter yang tersedia.</div>";
+            }
+            ?>
         </div>
-
-                  <div class="swiper-slide">
-                    <a href="dokter_david.php">
-            <div class="dokter-box">
-              <div class="dokter-img">
-               <img src="Images/team2.jpg" alt="">
-             </div>
-            <div class="dokter-text">
-              <strong>Dr. David Brown</strong>
-              <span>Spesialis Bedah Ortopedi</span>
-            </div>
-          </div>
-          </a>
-        </div>
-
-                  <div class="swiper-slide">
-                    <a href="dokter_linda.php">
-            <div class="dokter-box">
-              <div class="dokter-img">
-               <img src="Images/team3.jpg" alt="">
-             </div>
-            <div class="dokter-text">
-              <strong>Dr. Linda Davis</strong>
-              <span>Spesialis Dermatologi</span>
-            </div>
-          </div>
-          </a>
-        </div>
-
-                  <div class="swiper-slide">
-                    <a href="dokter_sarah.php">
-            <div class="dokter-box">
-              <div class="dokter-img">
-               <img src="Images/team4.jpg" alt="">
-             </div>
-            <div class="dokter-text">
-              <strong>Dr. Sarah Williams</strong>
-              <span>Spesialis THT</span>
-            </div>
-          </div>
-          </a>
-        </div>
-
-                  <div class="swiper-slide">
-                    <a href="dokter_michael.php">
-            <div class="dokter-box">
-              <div class="dokter-img">
-               <img src="Images/team5.jpg" alt="">
-             </div>
-            <div class="dokter-text">
-              <strong>Dr. Michael Lee</strong>
-              <span>Spesialis Penyakit Dalam</span>
-            </div>
-          </div>
-        </a>
-        </div>
-
-                  <div class="swiper-slide">
-                    <a href="dokter_jenifer.php">
-            <div class="dokter-box">
-              <div class="dokter-img">
-               <img src="Images/team6.jpg" alt="">
-             </div>
-            <div class="dokter-text">
-              <strong>Dr. Jennifer Clark</strong>
-              <span>Spesialis Ginekologi</span>
-            </div>
-          </div>
-          </a>
-        </div>
-        
-      </div>
         <div class="swiper-button-prev-dokter"><i class="fa-solid fa-arrow-left"></i></div>
         <div class="swiper-button-next-dokter"><i class="fa-solid fa-arrow-right"></i></div>
         <div class="swiper-pagination"></div>
-      </div>
-
     </div>
-    </section>
+</div>
+</section>
 
 
-    <section id="Berita">
-          <div class="berita-heading">
-            <h3>Simak Perkembangan Terbaru Seputar Kesehatan</h3>
-          </div>
-        </div>
 
-        <div class="berita-kumpulan">
-          <div class="berita-konten ">
-            <div class="berita-img">
-              <img src="Images/berita1.jpg" alt="">
-            </div>
-            <div class="berita-text">
-              <div class="berita-judul">
-                <strong>10 Perkembangan Teknologi Kesehatan di Tahun 2024</strong>
-                <p>Pada tahun 2024, terobosan teknologi di bidang kesehatan telah membuka pintu menuju masa depan yang lebih cerah dan lebih sehat bagi masyarakat di seluruh dunia. Berbagai inovasi telah mengubah paradigma dalam diagnosis, pengobatan, dan manajemen penyakit, memungkinkan praktisi kesehatan untuk memberikan perawatan yang lebih efektif dan tepat sasaran. Mari kita telaah beberapa tren utama dalam teknologi kesehatan yang mencuat pada tahun 2024...</p>
-                <a href="https://www.kompasiana.com/afnikurnia/65c9e31fde948f70151834a3/10-perkembangan-teknologi-kesehatan-di-tahun-2024">Baca Selengkapnya</a>
-                <i class="fa-solid fa-arrow-right"></i>
-              </div>
-            </div>
-          </div>
 
-          <div class="berita-konten">
-            <div class="berita-img">
-              <img src="Images/berita22.jpg" alt="">
-            </div>
-            <div class="berita-text">
-              <div class="berita-judul">
-                <strong>Makin banyak kaum muda Indonesia kena serangan jantung, apa saja penyebabnya?</strong>
-                <p>Jika Anda mengira bahwa orang yang rentan terkena serangan jantung adalah orang lanjut usia alias lansia, coba pikir lagi. Beberapa tahun belakangan, jumlah pasien jantung usia muda dilaporkan meningkat di Indonesia. Apa saja penyebabnya?...</p>
-                <a href="https://www.tribunnews.com/internasional/2024/07/16/makin-banyak-kaum-muda-indonesia-kena-serangan-jantung-apa-saja-penyebabnya">Baca Selengkapnya</a>
-                <i class="fa-solid fa-arrow-right"></i>
-              </div>
-            </div>
-          </div>
+<section id="Berita">
+    <div class="berita-heading">
+        <h3>Simak Perkembangan Terbaru Seputar Kesehatan</h3>
+    </div>
 
+    <div class="berita-kumpulan">
+        <?php
+        include('dbconn.php');
+
+        // Query untuk mengambil berita terbaru
+        $result = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal DESC LIMIT 3");
+        while ($row = mysqli_fetch_assoc($result)): ?>
             <div class="berita-konten">
-            <div class="berita-img">
-              <img src="Images/berita3.jpg" alt="">
+                <div class="berita-img">
+                    <img src="images/<?= $row['gambar'] ?>" alt="<?= $row['judul'] ?>">
+                </div>
+                <div class="berita-text">
+                    <div class="berita-judul">
+                        <strong><?= $row['judul'] ?></strong>
+                        <p><?= substr($row['konten'], 0, 100) ?>...</p>
+                        <a href="<?= $row['link'] ?>" target="_blank">Baca Selengkapnya</a>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </div>
             </div>
-            <div class="berita-text">
-              <div class="berita-judul">
-                <strong>Daftar 6 Minuman yang Bisa Turunkan Kadar Gula Darah, Termasuk Kopi</strong>
-                <p>Bukan cuma apa yang dimakan, minuman juga jelas berpengaruh pada kadar gula darah seseorang.
-                  Saat ingin menurunkan kadar gula darah, sebaiknya menghindaei minuman manis, seperti soda, campuran jus buah, limun, dan teh manis atau bahkan minuman boba. Ada banyak minuman lain yang kaya manfaat dan berpengaruh pada fungsi metabolisme tubuh lebih baik....</p>
-                <a href="https://health.detik.com/berita-detikhealth/d-7662446/daftar-6-minuman-yang-bisa-turunkan-kadar-gula-darah-termasuk-kopi">Baca Selengkapnya</a>
-                <i class="fa-solid fa-arrow-right"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+        <?php endwhile; ?>
+    </div>
+</section>
+
+
 
 <footer>
   <div class="footer-top">

@@ -24,203 +24,194 @@ include('dbconn.php');
     </header>
 
     <main>
-        <!-- Section: Data Berita -->
-        <section id="berita">
-            <h2>Data Berita</h2>
-            <button onclick="window.location.href='berita.php'">Tambah Berita</button>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Judul</th>
-                            <th>Konten</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $query = "SELECT * FROM berita";
-                        $result = mysqli_query($conn, $query);
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>
-                                    <td>{$row['id']}</td>
-                                    <td>{$row['judul']}</td>
-                                    <td>" . substr($row['konten'], 0, 50) . "...</td>
-                                    <td>
-                                        <a href='edit_berita.php?id={$row['id']}'><button>Edit</button></a>
-                                        <a href='hapus_berita.php?id={$row['id']}'><button>Hapus</button></a>
-                                    </td>
-                                  </tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+ <!-- Section: Data Berita -->
+<section id="berita">
+    <h2>Data Berita</h2>
+    <button onclick="window.location.href='tambah_berita.php'">Tambah Berita</button>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Judul</th>
+                    <th>Konten</th>
+                    <th>Gambar</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                include('dbconn.php'); // Pastikan koneksi database disertakan
 
-        <!-- Section: Data Jadwal Dokter -->
-        <section id="jadwal">
-            <h2>Data Jadwal Dokter</h2>
-            <button onclick="window.location.href='jadwal_dokter.php'">Tambah Jadwal</button>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nama</th>
-                            <th>Hari</th>
-                            <th>Jam</th>
-                            <th>Lokasi</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $query = "SELECT * FROM jadwal_dokter";
-                        $result = mysqli_query($conn, $query);
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>
-                                    <td>{$row['id']}</td>
-                                    <td>{$row['name']}</td>
-                                    <td>{$row['hari']}</td>
-                                    <td>{$row['jam']}</td>
-                                    <td>{$row['Lokasi']}</td>
-                                    <td>
-                                        <a href='edit_jadwal_dokter.php?id={$row['id']}'><button>Edit</button></a>
-                                        <a href='hapus_jadwal_dokter.php?id={$row['id']}'><button>Hapus</button></a>
-                                    </td>
-                                  </tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                $query = "SELECT * FROM berita";
+                $result = mysqli_query($conn, $query);
 
-        <!-- Section: Dokter -->
-        <section id="dokter">
-            <h2>Dokter</h2>
-            <button onclick="window.location.href='dokter.php'">Tambah Dokter</button>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nama Dokter</th>
-                            <th>Spesialis</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // Query untuk mengambil data dokter
-                        $query = "SELECT id, nama, spesialis FROM dokter";
-                        $result = mysqli_query($conn, $query);
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "<tr>
+                            <td>{$row['id']}</td>
+                            <td>{$row['judul']}</td>
+                            <td>" . substr($row['konten'], 0, 50) . "...</td>
+                            <td>
+                                <img src='images/{$row['gambar']}' alt='Gambar Berita' style='width:100px; height:auto;'>
+                            </td>
+                            <td>
+                                <a href='edit_berita.php?id={$row['id']}'><button>Edit</button></a>
+                                <a href='hapus_berita.php?id={$row['id']}'><button>Hapus</button></a>
+                            </td>
+                          </tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</section>
 
-                        // Periksa apakah data ada
-                        if (mysqli_num_rows($result) > 0) {
-                            // Loop untuk menampilkan data dokter
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo "<tr>
-                                        <td>{$row['id']}</td>
-                                        <td>{$row['nama']}</td>
-                                        <td>{$row['spesialis']}</td>
-                                        <td>
-                                            <a href='edit_dokter.php?id={$row['id']}'><button>Edit</button></a>
-                                            <a href='hapus_dokter.php?id={$row['id']}'><button>Hapus</button></a>
-                                        </td>
-                                    </tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='4'>Tidak ada data dokter.</td></tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </section>
 
-        <!-- Section: Data Poli -->
-        <section id="poli">
-            <h2>Data Poli</h2>
-            <button onclick="window.location.href='poli.php'">Tambah Poli</button>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nama Poli</th>
-                            <th>Deskripsi</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $query = "SELECT * FROM poli";
-                        $result = mysqli_query($conn, $query);
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>
-                                    <td>{$row['id']}</td>
-                                    <td>{$row['nama_poli']}</td>
-                                    <td>{$row['description']}</td>
-                                    <td>
-                                        <a href='edit_poli.php?id={$row['id']}'><button>Edit</button></a>
-                                        <a href='hapus_poli.php?id={$row['id']}'><button>Hapus</button></a>
-                                    </td>
-                                  </tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </section>
 
-        <!-- Section: Antrian -->
-        <section id="antrian">
-            <h2>Antrian</h2>
-            <button onclick="window.location.href='antrian.php'">Tambah Antrian</button>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nama</th>
-                            <th>No Antrian</th>
-                            <th>Layanan</th>
-                            <th>Waktu Mengambil Antrian</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $query = "SELECT appointments.id, users.name AS nama_pasien, appointments.no_antrian, 
-                        poli.nama_poli, dokter.nama AS nama_dokter, appointments.waktu
-                        FROM appointments 
-                        INNER JOIN users ON appointments.user_id = users.id
-                        INNER JOIN poli ON appointments.poli_id = poli.id
-                        INNER JOIN dokter ON appointments.dokter_id = dokter.id";
-                        $result = mysqli_query($conn, $query);
-                        
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>
-                                    <td>{$row['id']}</td>
-                                    <td>{$row['nama_pasien']}</td>
-                                    <td>{$row['no_antrian']}</td>
-                                    <td>{$row['nama_poli']}</td>
-                                    <td>{$row['nama_dokter']}</td>
-                                    <td>{$row['waktu']}</td>
-                                    <td>
-                                        <a href='edit_antrian.php?id={$row['id']}'><button>Edit</button></a>
-                                        <a href='hapus_antrian.php?id={$row['id']}'><button>Hapus</button></a>
-                                    </td>
-                                    </tr>";
-                        }        
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+       <!-- admin_dokter.php -->
+<section id="dokter">
+    <h2>Dokter</h2>
+    <button onclick="window.location.href='tambah_dokter.php'">Tambah Dokter</button>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama Dokter</th>
+                    <th>Spesialis</th>
+                    <th>Gambar</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Query untuk mengambil data dokter
+                $query = "SELECT id, nama, spesialis, gambar FROM dokterinfo";
+                $result = mysqli_query($conn, $query);
+
+                // Periksa apakah data ada
+                if (mysqli_num_rows($result) > 0) {
+                    // Loop untuk menampilkan data dokter
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $gambarPath = 'images/' . $row['gambar']; // Path gambar dokter
+                        echo "<tr>
+                                <td>{$row['id']}</td>
+                                <td>{$row['nama']}</td>
+                                <td>{$row['spesialis']}</td>
+                                <td><img src='$gambarPath' alt='{$row['nama']}' width='100' height='100'></td>
+                                <td>
+                                    <a href='edit_dokter.php?id={$row['id']}'><button>Edit</button></a>
+                                    <a href='hapus_dokter.php?id={$row['id']}'><button>Hapus</button></a>
+                                </td>
+                            </tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='5'>Tidak ada data dokter.</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section id="detailDokter">
+    <h2>Kelola Detail Dokter</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama Dokter</th>
+                    <th>Profil</th>
+                    <th>Jadwal Praktik</th>
+                    <th>Kontak</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Query untuk mengambil data dokter dari database
+                $query = "SELECT id, nama, spesialis, gambar, profil, jadwal, kontak_email, kontak_telepon FROM dokterinfo";
+$result = mysqli_query($conn, $query);
+
+// Periksa apakah ada data dokter
+if (mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        // Menampilkan data dokter dalam tabel
+        echo "<tr>
+                <td>{$row['id']}</td>
+                <td>{$row['nama']}</td>
+                <td>" . substr($row['profil'], 0, 50) . "...</td> <!-- Profil Dokter -->
+                <td>" . substr($row['jadwal'], 0, 50) . "...</td> <!-- Jadwal Praktik -->
+                <td>Email: {$row['kontak_email']}<br>Telepon: {$row['kontak_telepon']}</td> <!-- Kontak -->
+                <td>
+                    <a href='edit_detail_dokter.php?id={$row['id']}'><button>Edit</button></a>
+                </td>
+            </tr>";
+    }
+} else {
+    echo "<tr><td colspan='6'>Tidak ada detail dokter yang tersedia.</td></tr>";
+}
+
+
+                ?>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+
+
+<!-- Section: Data Poli -->
+<section id="poli">
+    <h2>Data Poli</h2>
+    <button onclick="window.location.href='tambah_poli.php'">Tambah Poli</button>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama Poli</th>
+                    <th>Deskripsi</th>
+                    <th>Icon</th>
+                    <th>Gambar</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Koneksi ke database
+                include('dbconn.php');
+
+                // Query untuk mengambil data poli
+                $query = "SELECT * FROM poli";
+                $result = mysqli_query($conn, $query);
+
+                // Cek apakah ada data
+                if (mysqli_num_rows($result) > 0) {
+                    // Loop untuk menampilkan data poli
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<tr>
+                                <td>{$row['id']}</td>
+                                <td>{$row['nama_poli']}</td>
+                                <td>{$row['description']}</td>
+                                <td><i class='{$row['icon']}'></i></td>
+                                <td><img src='images/{$row['gambar']}' alt='{$row['nama_poli']}' width='50'></td>
+                                <td>
+                                    <a href='poli_detail.php?id={$row['id']}'><button>Lihat Detail</button></a>
+                                    <a href='edit_poli.php?id={$row['id']}'><button>Edit</button></a>
+                                    <a href='hapus_poli.php?id={$row['id']}'><button>Hapus</button></a>
+                                </td>
+                              </tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='6'>Tidak ada data poli.</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</section>
 
         <!-- Section: Rekam Medis -->
         <section id="rekam-medis">
@@ -241,7 +232,7 @@ include('dbconn.php');
                         <?php
                         $query = "SELECT rekam_medis.id, users.name AS pasien, rekam_medis.diagnosis, dokter.nama AS dokter
                                 FROM rekam_medis 
-                                INNER JOIN users ON rekam_medis.pasien_id = users.id
+                                INNER JOIN users ON rekam_medis.user_id = users.id
                                 INNER JOIN dokter ON rekam_medis.dokter_id = dokter.id";
                         $result = mysqli_query($conn, $query);
                         while ($row = mysqli_fetch_assoc($result)) {

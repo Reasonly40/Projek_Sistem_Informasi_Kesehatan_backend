@@ -1,134 +1,133 @@
 <?php
-// Menghubungkan ke database
-include 'dbconn.php';
+// Koneksi ke database
+include('dbconn.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
-    if (isset($_GET['id'])) {
-        $id = intval($_GET['id']); // Ambil ID poli dari parameter GET
-        $query = "DELETE FROM poli WHERE id = ?"; // Ganti 'poli' dengan nama tabel jika berbeda
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, "i", $id);
+// Cek apakah ada id poli yang dikirimkan
+if (isset($_GET['id'])) {
+    $poli_id = $_GET['id'];
 
-        if (mysqli_stmt_execute($stmt)) {
-            // Redirect ke halaman daftar poli setelah berhasil menghapus
-            header("Location: data_poli.php?message=deleted");
-            exit;
-        } else {
-            echo "Terjadi kesalahan: " . mysqli_error($conn);
-        }
+    // Query untuk mengambil data poli berdasarkan ID
+    $query_poli = "SELECT * FROM poli WHERE id = '$poli_id'";
+    $result_poli = mysqli_query($conn, $query_poli);
+
+    if (mysqli_num_rows($result_poli) > 0) {
+        $poli = mysqli_fetch_assoc($result_poli);
     } else {
-        echo "ID tidak valid.";
+        echo "Poli tidak ditemukan.";
+        exit();
     }
+
+    // Proses hapus jika tombol konfirmasi diklik
+    if (isset($_POST['hapus'])) {
+        // Menghapus data dokter yang terkait dengan poli
+        $query_dokter = "DELETE FROM poli_dokter WHERE poli_id = '$poli_id'";
+        if (!mysqli_query($conn, $query_dokter)) {
+            echo "Error: " . $query_dokter . "<br>" . mysqli_error($conn);
+        }
+
+        // Menghapus data poli
+        $query_poli_delete = "DELETE FROM poli WHERE id = '$poli_id'";
+        if (mysqli_query($conn, $query_poli_delete)) {
+            echo "Poli berhasil dihapus!";
+            header("Location: admin.php"); // Redirect ke halaman admin setelah penghapusan
+            exit();
+        } else {
+            echo "Error: " . $query_poli_delete . "<br>" . mysqli_error($conn);
+        }
+    }
+} else {
+    echo "ID poli tidak ditemukan.";
+    exit();
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konfirmasi Hapus Poli</title>
+    <title>Hapus Poli</title>
+
+    <!-- Link ke Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Gaya CSS tambahan untuk penataan -->
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
+            background-color: #f4f7fc;
         }
-
         .container {
-            width: 50%;
+            max-width: 900px;
             margin: 50px auto;
+            padding: 30px;
             background-color: #fff;
-            padding: 20px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-
-        h1 {
+        h2 {
             text-align: center;
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
         label {
-            margin: 10px 0 5px;
-            font-size: 16px;
-            color: #333;
+            font-weight: bold;
         }
-
-        input[type="text"], input[type="email"], input[type="phone"], input[type="date"], input[type="time"], textarea {
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 16px;
+        .btn-submit, .btn-back {
+            width: 100%;
+            padding: 15px;
             border: none;
             border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
+            font-size: 16px;
         }
-
-        button:hover {
-            background-color: #45a049;
+        .btn-submit {
+            background-color: #dc3545;
+            color: #fff;
         }
-
+        .btn-submit:hover {
+            background-color: #c82333;
+        }
         .btn-back {
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-align: center;
-            margin-top: 20px;
-            transition: background-color 0.3s;
+            background-color: #6c757d;
+            color: #fff;
+            margin-top: 10px;
         }
-
         .btn-back:hover {
-            background-color: #0056b3;
-        }
-
-        a {
-            display: inline-block;
-            text-align: center;
-            margin-top: 20px;
-            font-size: 16px;
-            color: #007BFF;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
+            background-color: #5a6268;
         }
     </style>
-    <script>
-        function confirmDeletion(event) {
-            event.preventDefault();
-            if (confirm("Apakah Anda yakin ingin menghapus poli ini?")) {
-                document.getElementById('delete-form').submit();
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Konfirmasi Hapus Poli</h1>
-        <form id="delete-form" method="POST" action="delete_poli.php?id=<?= htmlspecialchars($_GET['id']) ?>">
-            <button type="submit" name="confirm_delete" onclick="confirmDeletion(event)">Hapus</button>
+        <h2>Hapus Poli</h2>
+        
+        <!-- Konfirmasi Penghapusan Poli -->
+        <form action="hapus_poli.php?id=<?= $poli_id; ?>" method="POST">
+            <div class="form-group">
+                <label for="nama_poli">Nama Poli:</label>
+                <input type="text" class="form-control" value="<?= $poli['nama_poli']; ?>" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="deskripsi">Deskripsi:</label>
+                <textarea class="form-control" rows="4" disabled><?= $poli['description']; ?></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="spesialis">Spesialisasi:</label>
+                <input type="text" class="form-control" value="<?= $poli['spesialis']; ?>" disabled>
+            </div>
+
+            <p>Apakah Anda yakin ingin menghapus poli ini?</p>
+            
+            <!-- Tombol konfirmasi -->
+            <button type="submit" name="hapus" class="btn-submit">Hapus Poli</button>
         </form>
-        <a href="admin.php" class="btn-back">Kembali ke Beranda</a>
+
+        <!-- Tombol Kembali ke Halaman Admin -->
+        <a href="admin.php">
+            <button class="btn-back">Kembali ke Halaman Admin</button>
+        </a>
     </div>
 </body>
 </html>

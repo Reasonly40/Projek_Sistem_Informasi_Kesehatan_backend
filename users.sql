@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Dec 08, 2024 at 02:43 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: 127.0.0.1
+-- Generation Time: Dec 09, 2024 at 05:12 PM
+-- Server version: 11.1.0-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -48,7 +48,8 @@ INSERT INTO `users` (`id`, `email`, `password`, `role`, `name`, `alamat`, `tangg
 (9, 'admin@example.com', '0192023a7bbd73250516f069df18b500', 'admin', 'Administrator', 'Jl. Raya No. 1', '1980-01-01', '081234567890', 'Tidak Ada Diagnosis', NULL),
 (10, 'user@example.com', '6ad14ba9986e3615423dfca256d04e3f', 'user', 'John Doe', 'Jl. Sejahtera No. 2', '1990-05-15', '082233445566', 'Flu', 2),
 (11, 'atta@example.com', 'a4696143de4c48058d1cd51262c4be5e', 'user', 'atta', 'Jl. Merdeka No. 3', '1995-07-20', '083344556677', 'Batuk', 3),
-(12, 'durant@example.com', '906458c4c637a2c36a153f6f2ae491f5', 'user', 'Durant', 'Jl. Pahlawan No. 4', '1985-11-25', '084455667788', 'Pneumonia', 4);
+(12, 'durant@example.com', '906458c4c637a2c36a153f6f2ae491f5', 'user', 'Durant', 'Jl. Pahlawan No. 4', '1985-11-25', '084455667788', 'Pneumonia', 4),
+(14, 'lolonglaw31@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'user', 'louisa', NULL, NULL, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -70,7 +71,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- Constraints for dumped tables

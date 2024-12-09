@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
     $specialization = $_POST['specialization'];
 
-    $sql = "INSERT INTO doctors (name, specialization) VALUES ('$name', '$specialization')";
+    $sql = "INSERT INTO dokter (name, specialization) VALUES ('$name', '$specialization')";
     if ($conn->query($sql)) {
         $message = "Doctor added successfully!";
     } else {
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch doctors
-$result = $conn->query("SELECT * FROM doctors");
+$result = $conn->query("SELECT * FROM dokter");
 
 ?>
 

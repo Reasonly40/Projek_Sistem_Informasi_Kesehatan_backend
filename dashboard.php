@@ -59,7 +59,7 @@ $appointments_result = $conn->query($appointments_sql);
                     <thead>
                         <tr>
                             <th>No.</th>
-                            <th>Service</th>
+                            <th>poli</th>
                             <th>Doctor</th>
                             <th>Date</th>
                             <th>Time</th>
@@ -70,9 +70,9 @@ $appointments_result = $conn->query($appointments_sql);
                         <?php while ($appointment = $appointments_result->fetch_assoc()): ?>
                             <tr>
                                 <td><?= $appointment['id'] ?></td>
-                                <td><?= htmlspecialchars($appointment['service']) ?></td>
-                                <td><?= htmlspecialchars($appointment['doctor']) ?></td>
-                                <td><?= htmlspecialchars($appointment['date']) ?></td>
+                                <td><?= htmlspecialchars($appointment['poli']) ?></td>
+                                <td><?= htmlspecialchars($appointment['doctor_name']) ?></td>
+                                <td><?= htmlspecialchars($appointment['appointment_date']) ?></td>
                                 <td><?= htmlspecialchars($appointment['time']) ?></td>
                                 <td><?= htmlspecialchars($appointment['notes']) ?></td>
                             </tr>
