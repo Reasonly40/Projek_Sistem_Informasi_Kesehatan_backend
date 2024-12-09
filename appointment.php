@@ -10,12 +10,41 @@ try {
     $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Cek apakah form dikirimkan dengan metode POST
+    // Jika request method adalah GET, fetch data layanan dan dokter
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if (isset($_GET['fetch']) && $_GET['fetch'] === 'services') {
+            // Fetch daftar layanan (poli)
+            $sql = "SELECT id, nama_poli FROM poli";
+            $stmt = $pdo->query($sql);
+            $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($services);
+            exit();
+        }
+
+        if (isset($_GET['fetch']) && $_GET['fetch'] === 'doctors') {
+            // Fetch daftar dokter berdasarkan poli
+            if (!isset($_GET['poli_id'])) {
+                echo json_encode(['status' => 'error', 'message' => 'Poli ID tidak diberikan.']);
+                exit();
+            }
+
+            $poli_id = $_GET['poli_id'];
+            $sql = "SELECT id, nama_dokter, jadwal FROM dokter WHERE poli_id = :poli_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':poli_id', $poli_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $doctors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($doctors);
+            exit();
+        }
+    }
+
+    // Proses pengajuan janji temu
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Ambil data dari session (data user yang login)
-        if (isset($_SESSION['id'], $_SESSION['email'], $_SESSION['role'])) {
+        // Ambil data user dari session
+        if (isset($_SESSION['id'], $_SESSION['email'], $_SESSION['name'])) {
             $user_id = $_SESSION['id'];
-            $patient_name = $_SESSION['name']; // Pastikan nama tersimpan di session
+            $patient_name = $_SESSION['name'];
             $email = $_SESSION['email'];
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Silakan login untuk membuat janji temu.']);
@@ -30,11 +59,9 @@ try {
         $time = $_POST['time'];
         $notes = isset($_POST['notes']) ? $_POST['notes'] : '';
 
-        // Persiapkan query SQL untuk memasukkan data ke dalam database
+        // Simpan janji temu ke database
         $sql = "INSERT INTO appointments (user_id, patient_name, email, phone, service, doctor, date, time, notes) 
                 VALUES (:user_id, :patient_name, :email, :phone, :service, :doctor, :date, :time, :notes)";
-
-        // Persiapkan statement dan bind parameter
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':patient_name', $patient_name);
@@ -46,7 +73,6 @@ try {
         $stmt->bindParam(':time', $time);
         $stmt->bindParam(':notes', $notes);
 
-        // Eksekusi query
         if ($stmt->execute()) {
             echo json_encode(['status' => 'success', 'message' => 'Janji temu berhasil dibuat!']);
         } else {

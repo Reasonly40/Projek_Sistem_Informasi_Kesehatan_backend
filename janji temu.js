@@ -4,28 +4,56 @@ document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('appointmentForm');
   const successMessage = document.getElementById('successMessage');
 
-  // Daftar dokter berdasarkan layanan
-  const doctorsByService = {
-    poli_anak: ['Dr. Jasmine Cooper - Spesialis Anak'],
-    poli_bedah: ['Dr. David Brown - Spesialis Bedah Ortopedi'],
-    poli_kulit_dan_kelamin: ['Dr. Linda Davis - Spesialis Dermatologi'],
-    poli_tht: ['Dr. Sarah Williams - Spesialis THT'],
-    poli_penyakit_dalam: ['Dr. Michael Lee - Spesialis Penyakit Dalam'],
-    poli_ginekologi: ['Dr. Jennifer Clark - Spesialis Ginekologi']
-  };
+  // Fetch daftar layanan dari database
+  function fetchServices() {
+    fetch('fetch_services.php') // Ganti dengan endpoint API yang sesuai
+      .then(response => response.json())
+      .then(data => {
+        console.log('Respons dari server untuk layanan:', data); // Log respons untuk debugging
+        if (data.status === 'success') {
+          serviceDropdown.innerHTML = '<option value="">Pilih layanan</option>';
+          data.service.forEach(services => {
+            const option = document.createElement('option');
+            option.value = service.id; // ID layanan dari database
+            option.textContent = service.name; // Nama layanan dari database
+            serviceDropdown.appendChild(option);
+          });
+        } else {
+          alert('Gagal memuat daftar layanan.');
+        }
+      })
+      .catch(error => console.error('Error fetching services:', error));
+  }
+
+  // Fetch daftar dokter berdasarkan layanan
+  function fetchDoctors(serviceId) {
+    fetch(`fetch_doctors.php?service_id=${serviceId}`) // Ganti dengan endpoint API yang sesuai
+      .then(response => response.json())
+      .then(data => {
+        console.log('Respons dokter:', data); // Log respons untuk debugging
+        if (data.status === 'success') {
+          doctorDropdown.innerHTML = '<option value="">Pilih dokter</option>';
+          data.doctors.forEach(doctor => {
+            const option = document.createElement('option');
+            option.value = doctor.id; // ID dokter dari database
+            option.textContent = `${doctor.name} - ${doctor.specialty}`;
+            doctorDropdown.appendChild(option);
+          });
+        } else {
+          doctorDropdown.innerHTML = '<option value="">Tidak ada dokter tersedia</option>';
+        }
+      })
+      .catch(error => console.error('Error fetching doctors:', error));
+  }
 
   // Event listener untuk perubahan pilihan layanan
   serviceDropdown.addEventListener('change', function () {
-    const selectedService = serviceDropdown.value;
-    doctorDropdown.innerHTML = '<option value="">Pilih dokter</option>';
-
-    if (selectedService && doctorsByService[selectedService]) {
-      doctorsByService[selectedService].forEach(doctor => {
-        const option = document.createElement('option');
-        option.value = doctor;
-        option.textContent = doctor;
-        doctorDropdown.appendChild(option);
-      });
+    const selectedServiceId = serviceDropdown.value;
+    console.log('Layanan yang dipilih:', selectedServiceId); // Debugging
+    if (selectedServiceId) {
+      fetchDoctors(selectedServiceId);
+    } else {
+      doctorDropdown.innerHTML = '<option value="">Pilih layanan terlebih dahulu</option>';
     }
   });
 
@@ -43,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Kirim data form ke server menggunakan fetch
-    fetch('submit_appointment.php', {
+    fetch('appointment.php', {
       method: 'POST',
       body: formData
     })
@@ -53,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
           // Menampilkan pesan sukses
           successMessage.style.display = 'block';
           successMessage.textContent = data.message;
-          
+
           // Mereset form dan dropdown dokter
           form.reset();
           doctorDropdown.innerHTML = '<option value="">Pilih layanan terlebih dahulu</option>';
@@ -66,4 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
         alert('Terjadi kesalahan saat memproses data. Silakan coba lagi.');
       });
   });
+
+  // Memuat daftar layanan saat halaman selesai dimuat
+  fetchServices();
 });

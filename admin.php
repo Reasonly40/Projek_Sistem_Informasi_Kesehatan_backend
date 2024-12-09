@@ -197,7 +197,7 @@ include('dbconn.php');
                         $query = "SELECT appointments.id, users.name AS nama_pasien, appointments.no_antrian, 
                         poli.nama_poli, dokter.nama AS nama_dokter, appointments.waktu
                         FROM appointments 
-                        INNER JOIN users ON appointments.patient_id = users.id
+                        INNER JOIN users ON appointments.user_id = users.id
                         INNER JOIN poli ON appointments.poli_id = poli.id
                         INNER JOIN dokter ON appointments.dokter_id = dokter.id";
                         $result = mysqli_query($conn, $query);
