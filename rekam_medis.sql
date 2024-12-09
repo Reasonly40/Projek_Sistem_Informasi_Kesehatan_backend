@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 08, 2024 at 02:43 PM
+-- Generation Time: Dec 09, 2024 at 01:12 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `rekam_medis` (
   `id` int(11) NOT NULL,
-  `pasien_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `poli_id` int(11) NOT NULL,
   `dokter_id` int(11) NOT NULL,
   `diagnosis` text NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE `rekam_medis` (
 --
 ALTER TABLE `rekam_medis`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `pasien_id` (`pasien_id`),
+  ADD KEY `pasien_id` (`user_id`),
   ADD KEY `poli_id` (`poli_id`),
   ADD KEY `dokter_id` (`dokter_id`);
 
@@ -68,9 +68,7 @@ ALTER TABLE `rekam_medis`
 -- Constraints for table `rekam_medis`
 --
 ALTER TABLE `rekam_medis`
-  ADD CONSTRAINT `rekam_medis_ibfk_1` FOREIGN KEY (`pasien_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `rekam_medis_ibfk_2` FOREIGN KEY (`poli_id`) REFERENCES `poli` (`id`),
-  ADD CONSTRAINT `rekam_medis_ibfk_3` FOREIGN KEY (`dokter_id`) REFERENCES `jadwal_dokter` (`id`);
+  ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
