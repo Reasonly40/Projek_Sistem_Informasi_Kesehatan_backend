@@ -2,6 +2,19 @@
 // session_start() jika ada kebutuhan session, seperti untuk login
 session_start();
 
+$user_id = $_SESSION['id'];
+$role = $_SESSION['role'];
+
+if (!isset($_SESSION['login'])) {
+  header("Location: login.php");
+  exit;
+}
+
+if ($_SESSION['role'] != 'user') {
+  header("Location: login.php");
+  exit;
+}
+
 // Include the database connection
 include('dbconn.php');
 ?>

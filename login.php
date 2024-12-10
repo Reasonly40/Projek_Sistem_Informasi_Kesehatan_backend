@@ -17,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         // User found, store session data
         $user = $result->fetch_assoc();
+        $_SESSION['login'] = true;
         $_SESSION['id'] = $user['id'];
         $_SESSION['email'] = $user['email'];
         $_SESSION['role'] = $user['role'];  // Assuming 'role' column exists (admin or user)
